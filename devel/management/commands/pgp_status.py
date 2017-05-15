@@ -26,7 +26,16 @@ class Command(BaseCommand):
             logger.level = logging.DEBUG
 
         now = timezone.now()
-        warning = now + timedelta(days=100)
+        warning = now + timedelta(days=30)
 
+        print('expired:')
         for key in DeveloperKey.objects.filter(expires__range=(now, warning)):
-                print(key)
+            print(key)
+            print(key.owner)
+            print(key.created)
+
+        print('revoked:')
+        for key in DeveloperKey.objects.filter(revoked__isnull=False):
+            print(key)
+            print(key.owner)
+            print(key.created)
