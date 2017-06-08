@@ -104,6 +104,9 @@ Running coverage:
         coverage run --omit='env*' --source='.' manage.py test
         coverage report
 
+Running integration tests:
+
+        ./manage.py test functional_tests
 
 # Production Installation
 
