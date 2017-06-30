@@ -1,0 +1,33 @@
+[
+    {
+        "fields": {
+            "website": "https://archlinux.org",
+            "interests": "",
+            "roles": "",
+            "other_contact": "",
+            "picture": "devs/silhouette.png",
+            "country": "CA",
+            "user": 2,
+            "allowed_repos": [
+                1,
+                2,
+                10,
+                3
+            ],
+            "time_zone": "UTC",
+            "yob": 2002,
+            "languages": "",
+            "alias": "developer",
+            "pgp_key": null,
+            "last_modified": "2017-06-30T15:17:45.024Z",
+            "favorite_distros": "",
+            "notify": false,
+            "latin_name": "",
+            "occupation": "",
+            "public_email": "developer@archlinux.org",
+            "location": ""
+        },
+        "model": "devel.userprofile",
+        "pk": 1
+    }
+]

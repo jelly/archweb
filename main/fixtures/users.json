@@ -1,0 +1,22 @@
+[
+    {
+        "fields": {
+            "username": "developer",
+            "first_name": "Dev",
+            "last_name": "Eveloper",
+            "is_active": true,
+            "is_superuser": false,
+            "is_staff": false,
+            "last_login": null,
+            "groups": [
+                1
+            ],
+            "user_permissions": [],
+            "password": "pbkdf2_sha256$20000$TejgAWVDCcSk$1e4GBJQrAgdQYA9uLUJwB/1ugnwiuXI/GZ3kDKUOIpA=",
+            "email": "developer@archlinux.org",
+            "date_joined": "2017-06-30T15:17:44Z"
+        },
+        "model": "auth.user",
+        "pk": 2
+    }
+]
