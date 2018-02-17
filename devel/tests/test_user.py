@@ -57,6 +57,10 @@ class FindUserTest(TestCase):
         self.user5 = User.objects.create(username="tim2", first_name="Tim",
                 last_name="Two", email="timtwo@example.com")
 
+    def tearDown(self):
+        for user in [self.user1, self.user2, self.user3, self.user4, self.user5]:
+            user.delete()
+
     def test_not_matching(self):
         self.assertIsNone(self.finder.find(None))
         self.assertIsNone(self.finder.find(""))

@@ -9,4 +9,4 @@ class DevelTemplatetagsTest(SimpleTestCase):
         user = User.objects.create(username="joeuser", first_name="Joe",
                                    last_name="User", email="user1@example.com")
         self.assertEqual(in_group(user, 'none'), False)
-
+        user.delete()
