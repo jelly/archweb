@@ -33,7 +33,7 @@ from django.contrib.auth.models import User
 
 from devel.utils import UserFinder
 from main.models import Arch, Package, PackageFile, Repo
-from packages.models import Depend, Conflict, Provision, Replacement, Update, PackageRelation
+from packages.models import Depend, Conflict, Provision, Replacement, Update, PackageRelation, FlagRequest
 from packages.utils import parse_version
 
 
@@ -213,8 +213,13 @@ def populate_pkg(dbpkg, repopkg, force=False, timestamp=None):
     # e.g. epoch or pkgver, but not pkgrel
     if dbpkg.epoch is None or dbpkg.epoch != repopkg.epoch:
         dbpkg.flag_date = None
+        # Remove flagged model
+        # TODO: what if only x86_64 is updated, also match arch? [testing]?
+        FlagRequest.objects.filter(pkgbase=dbpkg.pkgbase, repo=dbpkg.repo).delete()
     elif dbpkg.pkgver is None or dbpkg.pkgver != repopkg.ver:
         dbpkg.flag_date = None
+        # Remove flagged model
+        FlagRequest.objects.filter(pkgbase=dbpkg.pkgbase, repo=dbpkg.repo).delete()
 
     if repopkg.base:
         dbpkg.pkgbase = repopkg.base
