@@ -9,6 +9,9 @@ class MirrorLocationsTest(TestCase):
                                                           source_ip='8.8.8.8',
                                                           country='US')
 
+    def tearDown(self):
+        self.checklocation.delete()
+
     def test_mirrorlocations_json(self):
         response = self.client.get('/mirrors/locations/json/')
         self.assertEqual(response.status_code, 200)

@@ -1,9 +1,14 @@
 from django.test import TestCase
 
+from mirrors.models import MirrorUrl
 from mirrors.tests import create_mirror_url
 
 
 class MirrorStatusTest(TestCase):
+
+    def tearDown(self):
+        MirrorUrl.objects.all().delete()
+
     def test_status(self):
         response = self.client.get('/mirrors/status/')
         self.assertEqual(response.status_code, 200)
