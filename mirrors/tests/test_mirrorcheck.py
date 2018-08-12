@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.core.management import call_command
 
 
-from mirrors.tests import create_mirror_url
+from mirrors.tests import create_mirror_url, delete_all_mirror_urls
 from mirrors.models import MirrorLog
 
 
@@ -19,7 +19,7 @@ class MirrorCheckTest(TestCase):
         self.mirror_url = create_mirror_url()
 
     def tearDown(self):
-        self.mirror_url.delete()
+        delete_all_mirror_urls()
 
     @mock.patch('urllib2.Request')
     @mock.patch('urllib2.urlopen')
@@ -56,3 +56,4 @@ class MirrorCheckTest(TestCase):
         MirrorLog.objects.create(url=self.mirror_url, check_time=date)
         call_command('mirrorcheck')
         self.assertEqual(len(MirrorLog.objects.all()), 1)
+        MirrorLog.objects.all().delete()

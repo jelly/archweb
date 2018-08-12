@@ -3,7 +3,7 @@ import mock
 from django.test import TestCase
 from django.core.management import call_command
 
-from mirrors.tests import create_mirror_url
+from mirrors.tests import create_mirror_url, delete_all_mirror_urls
 
 
 class MirrorCheckTest(TestCase):
@@ -11,7 +11,7 @@ class MirrorCheckTest(TestCase):
         self.mirror_url = create_mirror_url()
 
     def tearDown(self):
-        self.mirror_url.delete()
+        delete_all_mirror_urls()
 
     @mock.patch('socket.getaddrinfo')
     def test_ip4_ip6(self, getaddrinfo):

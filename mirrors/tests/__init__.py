@@ -11,3 +11,7 @@ def create_mirror_url(name='mirror1', country='US',
                                               mirror=mirror,
                                               country=country)
         return mirror_url
+
+
+def delete_all_mirror_urls():
+    MirrorUrl.objects.all().delete()

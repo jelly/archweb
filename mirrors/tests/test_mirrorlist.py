@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from mirrors.tests import create_mirror_url
+from mirrors.tests import create_mirror_url, delete_all_mirror_urls
 from mirrors.models import Mirror
 
 
@@ -9,7 +9,7 @@ class MirrorListTest(TestCase):
         self.mirror_url = create_mirror_url()
 
     def tearDown(self):
-        self.mirror_url.delete()
+        delete_all_mirror_urls()
 
     def test_mirrorlist(self):
         response = self.client.get('/mirrorlist/')
