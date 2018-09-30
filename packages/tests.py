@@ -2,9 +2,11 @@ import unittest
 
 from django.core import mail
 from django.test import TestCase
+from django.contrib.auth.models import User
 
 from .alpm import AlpmAPI
 
+from packages.models import FlagRequest
 
 alpm = AlpmAPI()
 
@@ -290,5 +292,30 @@ class FlagPackage(TestCase):
         self.assertIn('Enter a valid and useful out-of-date message', response.content)
         self.assertEqual(len(mail.outbox), 0)
 
+    def test_unflag_package_removed(self):
+        data = {
+            'website': '',
+            'email': 'nobody@archlinux.org',
+            'message': 'new linux version',
+        }
+        response = self.client.post('/packages/core/x86_64/linux/flag/',
+                                    data,
+                                    follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEquals(len(FlagRequest.objects.all()), 1)
+
+        password = 'test'
+        user = User.objects.create_superuser('admin',
+                                             'admin@archlinux.org',
+                                             password)
+        self.client.post('/login/', {
+                                    'username': user.username,
+                                    'password': password
+        })
+
+        self.client.get('/packages/core/x86_64/linux/unflag/all/')
+        self.assertEquals(len(FlagRequest.objects.all()), 0)
+
+        user.delete()
 
 # vim: set ts=4 sw=4 et:

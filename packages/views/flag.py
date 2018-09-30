@@ -157,6 +157,7 @@ def flag_confirmed(request, name, repo, arch):
 
 @permission_required('main.change_package')
 def unflag(request, name, repo, arch):
+    print('wheee')
     pkg = get_object_or_404(Package.objects.normal(),
             pkgname=name, repo__name__iexact=repo, arch__name=arch)
     pkg.flag_date = None
@@ -171,6 +172,11 @@ def unflag_all(request, name, repo, arch):
     pkgs = Package.objects.filter(pkgbase=pkg.pkgbase,
             repo__testing=pkg.repo.testing, repo__staging=pkg.repo.staging)
     pkgs.update(flag_date=None)
+
+    # Clean up FlagRequests
+    FlagRequest.objects.filter(pkgbase=pkg.pkgbase, repo=pkg.repo,
+                               pkgrel=pkg.pkgrel, pkgver=pkg.pkgver,
+                               epoch=pkg.epoch).delete()
     return redirect(pkg)
 
 # vim: set ts=4 sw=4 et:
