@@ -98,13 +98,12 @@ In local_settings.py change the EMAIL_HOST to 'localhost' and the EMAIL_PORT to
 To the unittests execute the following commands:
 
         ./manage.py collectstatic --noinput
-        ./manage.py test
+        pytest
 
 Running coverage:
 
-        pip install coverage
-        coverage run --omit='env*' --source='.' manage.py test
-        coverage report
+        pip install pytest-cov
+        pytest --cov-report=term-missing --cov-report=html:coverage --cov=.
 
 
 # Production Installation

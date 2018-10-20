@@ -1,22 +1,13 @@
-from django.test import TestCase
-
+import pytest
 
 from main.templatetags.flags import country_flag
-from mirrors.models import CheckLocation
+from conftest import create_checklocation
 
 
-class FlagsTemplateTest(TestCase):
-
-    def setUp(self):
-        self.checkloc = CheckLocation.objects.create(hostname='arch.org',
-                                                     source_ip='127.0.0.1',
-                                                     country='US')
-
-    def tearDown(self):
-        self.checkloc.delete()
-
-    def test_country_flag(self):
-        flag = country_flag(self.checkloc.country)
-        self.assertIn(self.checkloc.country.name, flag)
-        self.assertIn(self.checkloc.country.code.lower(), flag)
-        self.assertEqual(country_flag(None), '')
+@pytest.mark.django_db(transaction=True)
+def test_country_flag():
+    checkloc = create_checklocation()
+    flag = country_flag(checkloc.country)
+    assert checkloc.country.name in flag
+    assert checkloc.country.code.lower() in flag
+    assert country_flag(None) == ''
