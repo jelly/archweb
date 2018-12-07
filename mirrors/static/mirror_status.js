@@ -2,7 +2,7 @@ function draw_graphs(location_url, log_url, container_id) {
     jQuery.when(jQuery.getJSON(location_url), jQuery.getJSON(log_url))
         .then(function(loc_data, log_data) {
             /* use the same color selection for a given URL in every graph */
-            var color = d3.scale.category10();
+            var color = d3.scaleOrdinal(d3.schemeCategory10);
             jQuery.each(loc_data[0].locations, function(i, val) {
                 mirror_status(container_id, val, log_data[0], color);
             });
@@ -17,10 +17,8 @@ function mirror_status(container_id, check_loc, log_data, color) {
             width = jq_div.width() - margin.left - margin.right,
             height = jq_div.height() - margin.top - margin.bottom;
 
-        var x = d3.time.scale.utc().range([0, width]),
-            y = d3.scale.linear().range([height, 0]),
-            x_axis = d3.svg.axis().scale(x).orient("bottom"),
-            y_axis = d3.svg.axis().scale(y).orient("left");
+        var x = d3.scaleUtc().range([0, width]),
+            y = d3.scaleLinear().range([height, 0]);
 
         /* remove any existing graph first if we are redrawing after resize */
         d3.select(chart_id).select("svg").remove();
@@ -33,7 +31,7 @@ function mirror_status(container_id, check_loc, log_data, color) {
         x.domain([
                 d3.min(data, function(c) { return d3.min(c.logs, function(v) { return v.check_time; }); }),
                 d3.max(data, function(c) { return d3.max(c.logs, function(v) { return v.check_time; }); })
-        ]).nice(d3.time.hour);
+        ]).nice(d3.timeHour);
         y.domain([
                 0,
                 d3.max(data, function(c) { return d3.max(c.logs, function(v) { return v.duration; }); })
@@ -43,7 +41,7 @@ function mirror_status(container_id, check_loc, log_data, color) {
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
-            .call(x_axis)
+            .call(d3.axisBottom(x))
             .append("text")
             .attr("class", "label")
             .attr("x", width)
@@ -53,7 +51,7 @@ function mirror_status(container_id, check_loc, log_data, color) {
 
         svg.append("g")
             .attr("class", "y axis")
-            .call(y_axis)
+            .call(d3.axisLeft(y))
             .append("text")
             .attr("class", "label")
             .attr("transform", "rotate(-90)")
@@ -62,10 +60,10 @@ function mirror_status(container_id, check_loc, log_data, color) {
             .style("text-anchor", "end")
             .text("Duration (seconds)");
 
-        var line = d3.svg.line()
-            .interpolate("basis")
+        var line = d3.line()
             .x(function(d) { return x(d.check_time); })
-            .y(function(d) { return y(d.duration); });
+            .y(function(d) { return y(d.duration); })
+            .curve(d3.curveBasis);
 
         /* ...then the points and lines between them. */
         var urls = svg.selectAll(".url")

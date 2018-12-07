@@ -16,7 +16,8 @@ function format_filesize(size, decimals) {
 
 function packages_treemap(chart_id, orderings, default_order) {
     var jq_div = jQuery(chart_id),
-        color = d3.scale.category20();
+        color = d3.scaleOrdinal(d3.schemeCategory20);
+
     var key_func = function(d) { return d.key; };
     var value_package_count = function(d) { return d.count; },
         value_flagged_count = function(d) { return d.flagged; },
@@ -27,7 +28,7 @@ function packages_treemap(chart_id, orderings, default_order) {
     value_package_count.is_size = value_flagged_count.is_size = false;
     value_compressed_size.is_size = value_installed_size.is_size = true;
 
-    var treemap = d3.layout.treemap()
+    var treemap = d3.treemap()
         .size([jq_div.width(), jq_div.height()])
         /*.sticky(true)*/
         .value(value_package_count)
@@ -151,17 +152,21 @@ function developer_keys(chart_id, data_url) {
     var jq_div = jQuery(chart_id),
         r = 10;
 
-    var force = d3.layout.force()
+    var force = d3.forceSimulation()
+    .force("charge", d3.forceManyBody());
+
+  /*
         .friction(0.5)
         .gravity(0.1)
         .charge(-500)
         .size([jq_div.width(), jq_div.height()]);
+        */
 
     var svg = d3.select(chart_id)
         .append("svg");
 
     d3.json(data_url, function(json) {
-        var fill = d3.scale.category20();
+        var fill = d3.scaleOrdinal(d3.schemeCategory20);
 
         var index_for_key = function(key) {
             var i;
@@ -205,7 +210,7 @@ function developer_keys(chart_id, data_url) {
             .style("stroke", "#888");
 
         /* anyone with more than 7 - 1 == 6 signatures gets the top value */
-        var stroke_color_scale = d3.scale.log().domain([1, 7]).range(["white", "green"]).clamp(true);
+        var stroke_color_scale = d3.scaleLog().domain([1, 7]).range(["white", "green"]).clamp(true);
 
         var node = svg.selectAll("circle")
             .data(json.nodes)
