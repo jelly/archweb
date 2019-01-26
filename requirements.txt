@@ -11,3 +11,5 @@ parse==1.11.1
 django-jinja==2.4.1
 sqlparse==0.2.4
 django-csp==3.5
+django-otp==0.5.1
+qrcode==6.1

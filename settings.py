@@ -52,6 +52,7 @@ MIDDLEWARE = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
     'csp.middleware.CSPMiddleware',
 )
@@ -111,6 +112,12 @@ INSTALLED_APPS = (
     'django.contrib.sitemaps',
     'django.contrib.admin',
     'django.contrib.staticfiles',
+
+    'django_otp',
+    'django_otp.plugins.otp_totp',
+    'django_otp.plugins.otp_hotp',
+    'django_otp.plugins.otp_static',
+
     'django_countries',
 
     'main',
@@ -165,6 +172,8 @@ TORRENT_TRACKERS = (
 
 # How long to keep mirrorlog's in days
 MIRRORLOG_RETENTION_PERIOD = 365
+
+OTP_TOTP_ISSUER = 'Arch Linux Archweb'
 
 # Shorten some names just a bit
 COUNTRIES_OVERRIDE = {

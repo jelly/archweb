@@ -8,6 +8,10 @@ from django.conf import settings
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 
+from django_otp.admin import OTPAdminSite
+
+admin.site.__class__ = OTPAdminSite
+
 from feeds import PackageFeed, NewsFeed, ReleaseFeed, PackageUpdatesFeed
 import sitemaps
 
@@ -100,9 +104,10 @@ urlpatterns.extend([
         name='news-sitemap'),
 ])
 
+from django_otp.views import LoginView as OTPLoginView
 # Authentication
 urlpatterns.extend([
-    url(r'^login/$', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    url(r'^login/$', OTPLoginView.as_view(template_name='registration/login.html'), name='login'),
     url(r'^logout/$', auth_views.LogoutView.as_view(template_name='registration/logout.html'), name='logout'),
 ])
 
