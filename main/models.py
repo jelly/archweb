@@ -444,6 +444,21 @@ class PackageFile(models.Model):
         db_table = 'package_files'
 
 
+class RebuilderdStatus(models.Model):
+    REBUILDERD_STATUSES = (
+        (0, 'Good'),
+        (1, 'Bad'),
+        (2, 'Unknown'),
+    )
+
+    pkg = models.ForeignKey(Package, on_delete=models.CASCADE)
+    was_good = models.BooleanField(default=False)
+    status = models.SmallIntegerField(default=2, choices=REBUILDERD_STATUSES)
+
+    def __str__(self):
+        return "%s%s" % (self.pkg.pkgname, self.REBUILDERD_STATUSES[self.status])
+
+
 from django.db.models.signals import pre_save
 
 # note: reporead sets the 'created' field on Package objects, so no signal
