@@ -445,18 +445,30 @@ class PackageFile(models.Model):
 
 
 class RebuilderdStatus(models.Model):
+    # https://github.com/kpcyrd/rebuilderd/blob/2eeef725940ca8710c7c21579ce093445d1875c8/common/src/api.rs#L279
+    GOOD = 0
+    BAD = 1
+    UNKNOWN = 2
+
+    REBUILDERD_API_STATUSES = {
+        'GOOD': GOOD,
+        'BAD': BAD,
+        'UNKWN': UNKNOWN,
+    }
     REBUILDERD_STATUSES = (
-        (0, 'Good'),
-        (1, 'Bad'),
-        (2, 'Unknown'),
+        (GOOD, 'Good'),
+        (BAD, 'Bad'),
+        (UNKNOWN, 'Unknown'),
     )
 
-    pkg = models.ForeignKey(Package, on_delete=models.CASCADE)
-    was_good = models.BooleanField(default=False)
-    status = models.SmallIntegerField(default=2, choices=REBUILDERD_STATUSES)
+    pkg = models.OneToOneField(Package, on_delete=models.CASCADE)
+    status = models.SmallIntegerField(default=UNKNOWN, choices=REBUILDERD_STATUSES)
+
+    def status_str(self):
+        return self.REBUILDERD_STATUSES[self.status]
 
     def __str__(self):
-        return "%s%s" % (self.pkg.pkgname, self.REBUILDERD_STATUSES[self.status])
+        return "%s%s" % (self.pkg.pkgname, self.status_str)
 
 
 from django.db.models.signals import pre_save

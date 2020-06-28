@@ -2,21 +2,19 @@
 """
 read_reproducible_status command
 
-Import reproducible status of packages.
+Import reproducible status of packages, rebuilderd url configured in django
+settings.
 
-Usage: ./manage.py read_reproducible_status <url>
+Usage: ./manage.py read_reproducible_status
 """
 
-from collections import OrderedDict
-from datetime import datetime
 import logging
-import subprocess
 import sys
 
 import requests
 
-from django.core.management.base import BaseCommand, CommandError
-from django.db import transaction
+from django.conf import settings
+from django.core.management.base import BaseCommand
 
 from main.models import Arch, Repo, Package, RebuilderdStatus
 
@@ -28,20 +26,9 @@ logging.basicConfig(
     stream=sys.stderr)
 logger = logging.getLogger()
 
-# https://github.com/kpcyrd/rebuilderd/blob/master/common/src/lib.rs#L34
-REBUILDERD_STATUSES = {
-    'GOOD': 0,
-    'BAD': 1,
-    'UNKWN': 2,
-}
-
 
 class Command(BaseCommand):
-    args = "<url>"
     help = "Import reproducible status from rebuilderd."
-
-    def add_arguments(self, parser):
-        parser.add_argument('args', nargs='*', help='<url>')
 
     def handle(self, *args, **options):
         v = int(options.get('verbosity', None))
@@ -52,10 +39,12 @@ class Command(BaseCommand):
         elif v >= 2:
             logger.level = logging.DEBUG
 
-        if len(args) < 1:
-            raise CommandError("rebuilderd url must be provided")
+        url = getattr(settings, "REBUILDERD_URL", None)
+        if not url:
+            logger.error("no rebuilderd_url configured in local_settings.py")
 
-        import_rebuilderd_status(args[0])
+        import_rebuilderd_status(url)
+
 
 def import_rebuilderd_status(url):
     statuses = []
@@ -70,12 +59,19 @@ def import_rebuilderd_status(url):
         pkgver, pkgrel = pkg['version'].rsplit('-', 1)
 
         dbpkg = Package.objects.filter(pkgname=pkg['name'], pkgver=pkgver,
-                                    pkgrel=pkgrel, repo=repository, arch=arch)
+                                       pkgrel=pkgrel, repo=repository,
+                                       arch=arch).first()
         if not dbpkg:
             continue
 
-        status = REBUILDERD_STATUSES.get(suite['status'], 2)
-        rbstatus = RebuilderdStatus(pkg=pkg, status=status)
+        rebuilderdpkg = RebuilderdStatus.objects.filter(pkg=dbpkg)
+        if rebuilderdpkg:
+            continue
+
+        logger.info('adding status for package: %s', pkg['name'])
+
+        status = RebuilderdStatus.REBUILDERD_API_STATUSES.get(pkg['status'], RebuilderdStatus.UNKNOWN)
+        rbstatus = RebuilderdStatus(pkg=dbpkg, status=status)
         statuses.append(rbstatus)
 
     RebuilderdStatus.objects.bulk_create(statuses)
