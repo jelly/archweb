@@ -478,6 +478,15 @@ class RebuilderdStatus(models.Model):
         return "pkg=%s, status=%s" % (self.pkg, self.status_str)
 
 
+class Soname(models.Model):
+
+    pkg = models.ForeignKey(Package, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return "pkg=%s, name=%s" % (self.pkg, self.name)
+
+
 from django.db.models.signals import pre_save
 
 # note: reporead sets the 'created' field on Package objects, so no signal

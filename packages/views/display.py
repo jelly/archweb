@@ -6,7 +6,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
 
-from main.models import Package, PackageFile, Arch, Repo
+from main.models import Package, PackageFile, Arch, Repo, Soname
 from main.utils import empty_response
 from mirrors.utils import get_mirror_url_for_download
 from ..models import Update

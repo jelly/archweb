@@ -17,6 +17,7 @@ package_patterns = [
     url(r'^signoff/revoke/$', views.signoff_package, {'revoke': True}),
     url(r'^signoff/options/$', views.signoff_options),
     url(r'^download/$', views.download),
+    #url(r'^sonames/$', views.sogrep),
 ]
 
 urlpatterns = [
@@ -24,6 +25,7 @@ urlpatterns = [
     url(r'^signoffs/$', views.signoffs, name='package-signoffs'),
     url(r'^signoffs/json/$', views.signoffs_json, name='package-signoffs-json'),
     url(r'^update/$', views.update),
+    url(r'^sonames$', views.sonames),
 
     url(r'^$', SearchListView.as_view(), name='packages-search'),
     url(r'^search/json/$', views.search_json),
