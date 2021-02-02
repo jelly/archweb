@@ -11,7 +11,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_safe, require_POST
 
 from main.models import Package
-from ..models import PackageRelation
+from ..models import PackageRelation, Update
 from ..utils import multilib_differences, get_wrong_permissions
 
 
@@ -107,13 +107,13 @@ def stale_relations(request):
     pkgbases = Package.objects.all().values('pkgbase')
 
     inactive_user = relations.filter(user__is_active=False)
-    missing_pkgbase = relations.exclude(
-        pkgbase__in=pkgbases).order_by('pkgbase')
+    updates = Update.objects.filter(pkgbase__in=pkgbases).values_list('created', flat=True).order_by('pkgbase')
+    missing_pkgbase = relations.exclude(pkgbase__in=pkgbases).order_by('pkgbase')
     wrong_permissions = get_wrong_permissions()
 
     context = {
         'inactive_user': inactive_user,
-        'missing_pkgbase': missing_pkgbase,
+        'missing_pkgbase': zip(missing_pkgbase, updates),
         'wrong_permissions': wrong_permissions,
     }
     return render(request, 'packages/stale_relations.html', context)

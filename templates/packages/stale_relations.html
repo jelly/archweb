@@ -56,14 +56,14 @@
             </tr>
         </thead>
         <tbody>
-            {% for relation in missing_pkgbase %}
+            {% for relation, last_update in missing_pkgbase %}
             <tr>
                 <td><input type="checkbox" class="relation-checkbox" name="relation_id" value="{{ relation.id }}" /></td>
                 <td>{{ relation.pkgbase }}</td>
                 <td>{{ relation.user.get_full_name }}</td>
                 <td>{{ relation.get_type_display }}</td>
                 <td>{{ relation.created }}</td>
-                <td>{{ relation.last_update.created }}</td>
+                <td>{{ last_update }}</td>
             </tr>
             {% empty %}
                 <tr class="empty"><td colspan="6"><em>No non-existent pkgbase relations.</em></td></tr>
