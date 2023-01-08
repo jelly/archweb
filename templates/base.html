@@ -1,11 +1,14 @@
 {% load static %}<!DOCTYPE html>
+{% load compress %}
 {% load group %}
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="theme-color" content="#08C">
     <title>{% block title %}Arch Linux{% endblock %}</title>
+    {% compress css %}
     <link rel="stylesheet" type="text/css" href="{% static "archweb.css" %}" media="screen" />
+    {% endcompress %}
     <link rel="icon" type="image/x-icon" href="{% static "favicon.ico" %}" />
     <link rel="shortcut icon" type="image/x-icon" href="{% static "favicon.ico" %}" />
     <link rel="apple-touch-icon" href="{% static "logos/apple-touch-icon-57x57.png" %}" />

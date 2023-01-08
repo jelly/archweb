@@ -74,8 +74,15 @@ STATICFILES_DIRS = (
     path.join(DEPLOY_PATH, 'sitestatic'),
 )
 
-# Static files backend that allows us to use far future Expires headers
-STATICFILES_STORAGE = 'main.storage.MinifiedStaticFilesStorage'
+# List of finder classes that know how to find static files in
+# various locations.
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
+
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 # Configure where messages should reside
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
@@ -124,6 +131,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_countries',
     'django_extensions',
+    'compressor',
 
     'main',
     'mirrors',

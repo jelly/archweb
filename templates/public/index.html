@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 {% load cache %}
 {% load static %}
+{% load compress %}
 
 {% block head %}
 <link rel="alternate" type="application/rss+xml" title="Arch Linux News Updates" href="/feeds/news/" />
 <link rel="alternate" type="application/rss+xml" title="Arch Linux Package Updates" href="/feeds/packages/" />
+{% compress js %}
 <script type="text/javascript" src="{% static "homepage.js" %}" defer></script>
+{% endcompress %}
 {% if MASTODON_LINK %}<link rel="me" href="{{MASTODON_LINK}}" title="Arch Linux Mastodon" />{% endif %}
 {% endblock %}
 

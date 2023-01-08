@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load compress %}
 {% load pgp %}
 
 {% block title %}Arch Linux - Master Signing Keys{% endblock %}
@@ -136,6 +137,7 @@
 
 {% block script_block %}
 {% load cdn %}{% jquery %}{% jquery_tablesorter %}{% d3js %}
+{% compress js %}
 <script type="text/javascript" src="{% static "archweb.js" %}"></script>
 <script type="text/javascript" src="{% static "visualize.js" %}"></script>
 <script type="text/javascript" nonce={{ CSP_NONCE }}>
@@ -152,4 +154,5 @@ $(document).ready(function() {
     developer_keys("#visualize-keys", "{% url 'pgp-keys-json' %}");
 });
 </script>
+{% endcompress %}
 {% endblock %}
