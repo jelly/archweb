@@ -10,7 +10,7 @@ from main.models import Arch, Package, PackageFile, RebuilderdStatus, Repo, Sona
 from main.utils import empty_response
 from mirrors.utils import get_mirror_url_for_download
 
-from ..models import Update
+from ..models import PackageNote, Update
 from ..utils import PackageJSONEncoder, get_group_info
 
 
@@ -133,10 +133,12 @@ def details(request, name='', repo='', arch=''):
                 rbstatus = RebuilderdStatus.objects.get(pkg=pkg)
             except RebuilderdStatus.DoesNotExist:
                 pass
+
             if request.method == 'HEAD':
                 return empty_response()
             return render(request, 'packages/details.html', {'pkg': pkg, 'rbstatus': rbstatus,
-                          'notreproducible': rbstatus.status == RebuilderdStatus.BAD if rbstatus else False})
+                          'notreproducible': rbstatus.status == RebuilderdStatus.BAD if rbstatus else False,
+                          'package_note': pkg.package_note})
         except Package.DoesNotExist:
             # attempt a variety of fallback options before 404ing
             options = (redirect_agnostic, split_package_details,

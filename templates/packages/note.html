@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load package_extras %}
+{% load humanize %}
+
+{% block title %}Arch Linux - Add package note - {{ package.pkgname }} {{ package.full_version }} ({{ package.arch.name }}){% endblock %}
+{% block head %}<meta name="robots" content="noindex"/>{% endblock %}
+{% block navbarclass %}anb-packages{% endblock %}
+
+{% block content %}
+<div id="pkg-note" class="box">
+    <h2>Package note: {{ package.pkgname }} {{ package.full_version }} ({{ package.arch.name }})</h2>
+
+    <p>Note for the following {{ packages|length }} package{{ packages|pluralize }}:</p>
+    <ul>
+        {% for pkg in packages %}
+        <li>{% pkg_details_link pkg %} {{ pkg.full_version }} [{{ pkg.repo.name|lower }}] ({{ pkg.arch.name }})</li>
+        {% endfor %}
+    </ul>
+
+    <form id="note-pkg-form" method="post">{% csrf_token %}
+        <fieldset>
+            {{ form.as_p }}
+        </fieldset>
+        <p><label></label> <input title="Add package note" type="submit" value="Add package note" /></p>
+    </form>
+</div>
+{% endblock %}

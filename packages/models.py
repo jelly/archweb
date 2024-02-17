@@ -224,6 +224,44 @@ class FlagRequest(models.Model):
         return '%s from %s on %s' % (self.pkgbase, self.who(), self.created)
 
 
+class PackageNote(models.Model):
+    '''
+    A per package note
+    '''
+    created = models.DateTimeField(editable=False, db_index=True)
+    pkgbase = models.CharField(max_length=255, db_index=True)
+    pkgver = models.CharField(max_length=255)
+    pkgrel = models.CharField(max_length=255)
+    epoch = models.PositiveIntegerField(default=0)
+    repo = models.ForeignKey(Repo, on_delete=models.CASCADE)
+    num_packages = models.PositiveIntegerField('number of packages', default=1)
+    note = models.TextField('message to user', blank=True)
+
+    class Meta:
+        get_latest_by = 'created'
+
+    @property
+    def full_version(self):
+        # Difference here from other implementations at the moment: we need to
+        # handle the case of pkgver and pkgrel being null as this table didn't
+        # originally have version columns.
+        if self.pkgver == '' and self.pkgrel == '':
+            return ''
+        if self.epoch > 0:
+            return '%d:%s-%s' % (self.epoch, self.pkgver, self.pkgrel)
+        return '%s-%s' % (self.pkgver, self.pkgrel)
+
+    def get_associated_packages(self):
+        return Package.objects.normal().filter(
+            pkgbase=self.pkgbase,
+            repo__testing=self.repo.testing,
+            repo__staging=self.repo.staging).order_by(
+            'pkgname', 'repo__name', 'arch__name')
+
+    def __str__(self):
+        return 'Package note(%s,%s)' % (self.pkgbase, self.created)
+
+
 class FlagDenylist(models.Model):
     keyword = models.CharField(max_length=255)
 

@@ -39,6 +39,12 @@
         <fieldset>
             {{ form.as_p }}
         </fieldset>
+	{% if package_note %}
+           <div class="recentwarning">
+		<b>Package note:</b>
+	   	{{ package_note.note }}
+	   </div>
+	{% endif %}
         {% if package.is_recent %}
             <div>
                 <label></label>

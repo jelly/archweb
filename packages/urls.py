@@ -2,7 +2,7 @@ from django.conf.urls import include
 from django.urls import path, re_path
 
 from packages import views
-from packages.views import display, flag, search, signoff
+from packages.views import display, flag, note, search, signoff
 
 package_patterns = [
     path('', display.details),
@@ -11,6 +11,8 @@ package_patterns = [
     path('files/json/', display.files_json),
     path('flag/', flag.flag),
     path('flag/done/', flag.flag_confirmed, name='package-flag-confirmed'),
+    path('note/', note.note),
+    path('note/done/', note.note_confirmed, name='package-note-confirmed'),
     path('unflag/', flag.unflag),
     path('unflag/all/', flag.unflag_all),
     path('signoff/', signoff.signoff_package),

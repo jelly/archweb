@@ -133,7 +133,8 @@ def flag(request, name, repo, arch):
     context = {
         'package': pkg,
         'packages': pkgs,
-        'form': form
+        'form': form,
+        'package_note': pkg.package_note
     }
     return render(request, 'packages/flag.html', context)
 

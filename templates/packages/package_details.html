@@ -47,6 +47,13 @@
                     target="_blank"
                     >(?)</a></li>
                 {% endif %}
+                {% if perms.main.change_package %}
+			{% if package_note %}
+				<li><a href="note/" title="Edit package note">Edit package note</a></li>
+			{% else %}
+				<li><a href="note/" title="Add package note">Add package note</a></li>
+                	{% endif %}
+                {% endif %}
                 <li><a href="download/" rel="nofollow" title="Download {{ pkg.pkgname }} from mirror">Download From Mirror</a></li>
             </ul>
 

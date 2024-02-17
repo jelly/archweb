@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load package_extras %}
+
+{% block title %}Arch Linux - Package note added - {{ package.pkgname }} {{ package.full_version }} ({{ package.arch.name }}){% endblock %}
+{% block head %}<meta name="robots" content="noindex"/>{% endblock %}
+{% block navbarclass %}anb-packages{% endblock %}
+
+{% block content %}
+<div id="pkg-note" class="box">
+    <h2>Package note - {{ package.pkgname }}</h2>
+
+    <p>You can return to the package details page for {% pkg_details_link package %}.</p>
+</div>
+{% endblock %}

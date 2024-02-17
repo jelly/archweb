@@ -389,6 +389,16 @@ class Package(models.Model):
         except FlagRequest.DoesNotExist:
             return None
 
+    def package_note(self):
+        from packages.models import PackageNote
+        try:
+            request = PackageNote.objects.filter(
+                pkgbase=self.pkgbase, repo=self.repo,
+                pkgver=self.pkgver, epoch=self.epoch).latest()
+            return request
+        except PackageNote.DoesNotExist:
+            return None
+
     def is_same_version(self, other):
         'is this package similar, name and version-wise, to another'
         return self.pkgname == other.pkgname \
