@@ -1118,6 +1118,21 @@ ul.signoff-list {
     color: gray;
 }
 
+/* style the signoff button as a normal anchor */
+.signoff-form input {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: 100%;
+    color: #07b;
+}
+
+.signoff-form input:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 /* highlight current website in the navbar */
 header.anb-home ul li#anb-home a,
 header.anb-packages ul li#anb-packages a,

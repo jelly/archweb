@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
 import pytest
+from django.test import Client
 
 from main.models import Arch, Repo
 from packages.models import Package, Signoff, SignoffSpecification
@@ -39,7 +40,7 @@ def signoff_url(package, revoke=False):
 HEADERS = {'X-Requested-With': 'XMLHttpRequest'}
 
 def test_signoff_package(developer_client, developer, testing_package):
-    response = developer_client.get(signoff_url(testing_package))
+    response = developer_client.post(signoff_url(testing_package))
     assert response.status_code == 302
     assert response.url == '/packages/signoffs/'
 
@@ -49,7 +50,7 @@ def test_signoff_package(developer_client, developer, testing_package):
 
 
 def test_signoff_package_ajax(developer_client, testing_package):
-    response = developer_client.get(signoff_url(testing_package), headers=HEADERS)
+    response = developer_client.post(signoff_url(testing_package), headers=HEADERS)
     assert response.status_code == 200
     data = response.json()
     assert data['created'] is True
@@ -58,32 +59,47 @@ def test_signoff_package_ajax(developer_client, testing_package):
     assert data['user'] == 'joeuser'
 
     # signing off twice does not create a second signoff
-    response = developer_client.get(signoff_url(testing_package), headers=HEADERS)
+    response = developer_client.post(signoff_url(testing_package), headers=HEADERS)
     assert response.json()['created'] is False
     assert Signoff.objects.count() == 1
 
 
 def test_signoff_revoke(developer_client, developer, testing_package):
-    developer_client.get(signoff_url(testing_package))
-    response = developer_client.get(signoff_url(testing_package, revoke=True), headers=HEADERS)
+    developer_client.post(signoff_url(testing_package))
+    response = developer_client.post(signoff_url(testing_package, revoke=True), headers=HEADERS)
     assert response.status_code == 200
     assert response.json()['revoked'] is True
     assert Signoff.objects.get(user=developer).revoked is not None
 
 
+@pytest.mark.parametrize('revoke', [False, True])
+def test_signoff_get_not_allowed(developer_client, testing_package, revoke):
+    response = developer_client.get(signoff_url(testing_package, revoke=revoke))
+    assert response.status_code == 405
+    assert Signoff.objects.count() == 0
+
+
+def test_signoff_requires_csrf_token(developer, testing_package):
+    csrf_client = Client(enforce_csrf_checks=True)
+    csrf_client.force_login(developer)
+    response = csrf_client.post(signoff_url(testing_package))
+    assert response.status_code == 403
+    assert Signoff.objects.count() == 0
+
+
 def test_signoff_revoke_without_signoff(developer_client, testing_package):
-    response = developer_client.get(signoff_url(testing_package, revoke=True))
+    response = developer_client.post(signoff_url(testing_package, revoke=True))
     assert response.status_code == 404
 
 
 def test_signoff_non_testing_package(developer_client, package):
-    response = developer_client.get('/packages/core/x86_64/linux/signoff/')
+    response = developer_client.post('/packages/core/x86_64/linux/signoff/')
     assert response.status_code == 404
     assert Signoff.objects.count() == 0
 
 
 def test_signoff_anonymous(client, testing_package):
-    response = client.get(signoff_url(testing_package))
+    response = client.post(signoff_url(testing_package))
     assert response.status_code == 302
     assert '/login/' in response.url
     assert Signoff.objects.count() == 0
@@ -96,7 +112,7 @@ def test_signoff_not_accepted(developer_client, developer, testing_package, enab
         pkgrel=testing_package.pkgrel, epoch=testing_package.epoch,
         arch=testing_package.arch, repo=testing_package.repo,
         user=developer, enabled=enabled, known_bad=known_bad)
-    response = developer_client.get(signoff_url(testing_package))
+    response = developer_client.post(signoff_url(testing_package))
     assert response.status_code == 403
     assert Signoff.objects.count() == 0
 
@@ -110,7 +126,7 @@ def test_signoff_approved_sends_mail(developer_client, developer, testing_packag
         arch=testing_package.arch, repo=testing_package.repo,
         user=developer, required=1)
 
-    response = developer_client.get(signoff_url(testing_package), headers=HEADERS)
+    response = developer_client.post(signoff_url(testing_package), headers=HEADERS)
     assert response.json()['approved'] is True
     assert len(mailoutbox) == 1
     assert mailoutbox[0].to == [developer.email]

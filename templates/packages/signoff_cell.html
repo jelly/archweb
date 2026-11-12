@@ -6,14 +6,16 @@
 </ul>
 {% endif %}
 {% if group.user_signed_off %}
-<div>
-    <a class="signoff-link" href="{{ group.package.get_absolute_url }}signoff/revoke/"
-        title="Revoke signoff {{ group.pkgbase }} for {{ group.arch }}">Revoke Signoff</a></div>
+<form class="signoff-form" method="post" action="{{ group.package.get_absolute_url }}signoff/revoke/">{% csrf_token %}
+    <input type="submit" class="signoff-link" value="Revoke Signoff"
+        title="Revoke signoff {{ group.pkgbase }} for {{ group.arch }}"/>
+</form>
 {% else %}
 {% if not group.specification.known_bad and group.specification.enabled %}
-<div>
-    <a class="signoff-link" href="{{ group.package.get_absolute_url }}signoff/"
-        title="Signoff {{ group.pkgbase }} for {{ group.arch }}">Signoff</a></div>
+<form class="signoff-form" method="post" action="{{ group.package.get_absolute_url }}signoff/">{% csrf_token %}
+    <input type="submit" class="signoff-link" value="Signoff"
+        title="Signoff {{ group.pkgbase }} for {{ group.arch }}"/>
+</form>
 {% endif %}
 {% endif %}
 {% if user == group.packager or user in group.maintainers %}

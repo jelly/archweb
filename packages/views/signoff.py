@@ -12,6 +12,7 @@ from django.shortcuts import get_list_or_404, redirect, render
 from django.template import loader
 from django.utils.timezone import now
 from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_POST
 
 from main.models import Arch, Package, Repo
 
@@ -34,6 +35,7 @@ def signoffs(request):
 
 
 @permission_required('packages.change_signoff')
+@require_POST
 @never_cache
 def signoff_package(request, name, repo, arch, revoke=False):
     packages = get_list_or_404(Package, pkgbase=name,

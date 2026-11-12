@@ -265,13 +265,13 @@ function filter_report_load(report_id) {
 }
 
 /* signoffs.html */
-function signoff_package() {
-    // TODO: fix usage of this
-    var link = this;
-    $.getJSON(link.href, function(data) {
-        link = $(link);
+function signoff_package(event) {
+    event.preventDefault();
+    var form = $(this),
+        button = form.find('.signoff-link');
+    $.post(form.attr('action'), form.serialize(), function(data) {
         var signoff = null,
-            cell = link.closest('td');
+            cell = form.closest('td');
         if (data.created) {
             signoff = $('<li>').addClass('signed-username').text(data.user);
             var list = cell.children('ul.signoff-list');
@@ -280,7 +280,7 @@ function signoff_package() {
             }
             list.append(signoff);
         } else if(data.user) {
-            signoff = link.closest('td').find('li').filter(function(index) {
+            signoff = cell.find('li').filter(function(index) {
                 return $(this).text() == data.user;
             });
         }
@@ -288,7 +288,7 @@ function signoff_package() {
             signoff.text(signoff.text() + ' (revoked)');
         }
         /* update the approved column to reflect reality */
-        var approved = link.closest('tr').children('.approval');
+        const approved = form.closest('tr').children('.approval');
         approved.attr('class', 'approval');
         if (data.known_bad) {
             approved.text('Bad').addClass('signoff-bad');
@@ -299,25 +299,24 @@ function signoff_package() {
         } else {
             approved.text('No').addClass('signoff-no');
         }
-        link.removeAttr('title');
-        /* Form our new link. The current will be something like
+        button.removeAttr('title');
+        /* Form our new action. The current will be something like
          * '/packages/repo/arch/package/...' */
-        var base_href = link.attr('href').split('/').slice(0, 5).join('/');
+        var base_href = form.attr('action').split('/').slice(0, 5).join('/');
         if (data.revoked) {
-            link.text('Signoff');
-            link.attr('href', base_href + '/signoff/');
-            /* should we be hiding the link? */
+            button.val('Signoff');
+            form.attr('action', base_href + '/signoff/');
+            /* should we be hiding the form? */
             if (data.known_bad || !data.enabled) {
-                link.remove();
+                form.remove();
             }
         } else {
-            link.text('Revoke Signoff');
-            link.attr('href', base_href + '/signoff/revoke/');
+            button.val('Revoke Signoff');
+            form.attr('action', base_href + '/signoff/revoke/');
         }
         /* let tablesorter know the cell value has changed */
         $('.results').trigger('updateCell', [approved[0], false, null]);
-    });
-    return false;
+    }, 'json');
 }
 
 function filter_signoffs() {
